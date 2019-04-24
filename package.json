@@ -5,18 +5,22 @@
   "main": "src/server/index.js",
   "scripts": {
     "build": "webpack --mode production",
-    "start": "npm run build && node src/server/index.js",
+    "start": "npm run build && node main.js",
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "server": "nodemon src/server/index.js",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "seed": "node seed.js"
   },
   "author": "Sandeep Raveesh",
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "chalk": "^2.4.2",
     "express": "^4.16.3",
+    "pg": "^7.10.0",
     "react": "^16.5.2",
-    "react-dom": "^16.5.2"
+    "react-dom": "^16.5.2",
+    "sequelize": "^5.7.5"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
