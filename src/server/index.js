@@ -3,6 +3,10 @@ const os = require("os");
 
 const app = express();
 
+// body parsing middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static("dist"));
 app.use("/api", require("./api"));
 // app.get("/api/getUsername", (req, res) =>
