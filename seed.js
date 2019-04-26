@@ -19,9 +19,6 @@ const seed = async () => {
     await db.sync({ force: true });
     // seed your database here!
     const cards = await Promise.all(cardData.map(card => Card.create(card)));
-    cards.forEach(function(card) {
-      card.changeOverTime();
-    });
     const payments = await Promise.all(
       paymentData.map(payment => Payment.create(payment))
     );

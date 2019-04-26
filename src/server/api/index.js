@@ -14,7 +14,7 @@ const {
 router.get("/cards", async (req, res, next) => {
   try {
     const data = await Card.findAll({
-      include: [{ model: Charge }, { model: Payment }]
+      include: [{ all: true, nested: true }]
     });
     res.json(data);
   } catch (err) {
@@ -27,7 +27,20 @@ router.get("/cards/:accountNumber", async (req, res, next) => {
   try {
     const accountNumber = req.params.accountNumber;
     const data = await Card.findOne({
-      where: { accountNumber: accountNumber },
+      where: { accountNumber: accountNumber }
+      // include: [{ model: Charge }, { model: Payment }]
+    });
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+//SINGLECARD API ROUTE
+router.get("/cards/:cardId", async (req, res, next) => {
+  try {
+    const cardId = req.params.cardId;
+    const data = await Card.findOne({
+      where: { id: cardId },
       include: [{ model: Charge }, { model: Payment }]
     });
     res.json(data);
@@ -41,7 +54,6 @@ router.post("/cards", async (req, res, next) => {
   try {
     const newCard = new Card(req.body);
     const savingCard = await newCard.save();
-    savingCard.changeOverTime();
     res.json(savingCard);
   } catch (err) {
     next(err);
@@ -77,7 +89,7 @@ router.post("/charges", async (req, res, next) => {
       include: [{ model: Charge }, { model: Payment }]
     });
     //put together body obj for balaftercharge
-    console.log(data);
+    // console.log(data);
     let balAfterChargeObj = {
       beginDate: data.createdAt,
       todaysDate: new Date(),
