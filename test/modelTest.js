@@ -127,7 +127,12 @@ describe("The Charge & Payment models", () => {
     creditLimit: 1000,
     balance: 0
   };
-
+  const chargeOptions = {
+    accountNumber: 1234,
+    amount: 500,
+    date: 0,
+    CardId: 1
+  };
   const paymentOptions = {
     accountNumber: 5678,
     amount: 300,
@@ -135,83 +140,44 @@ describe("The Charge & Payment models", () => {
     CardId: 2
   };
 
+  let charge;
+  let payment;
+
   let card;
   beforeEach(() => {
     card = Card.build(cardOptions);
     charge = Charge.build(chargeOptions);
+    payment = Payment.build(paymentOptions);
   });
 
   afterEach(() => {
-    Promise.all([Card.truncate({ cascade: true })]);
-    Promise.all([Charge.truncate({ cascade: true })]);
+    return Promise.all([
+      Card.truncate({
+        cascade: true
+      }),
+      Charge.truncate({
+        cascade: true
+      }),
+      Payment.truncate({
+        cascade: true
+      })
+    ]);
   });
-  const chargeOptions = {
-    accountNumber: 1234,
-    amount: 500,
-    date: 0,
-    CardId: 1
-  };
 
-  let charge;
   describe("attributes definition`", () => {
     it("charge includes `amount,` `CardId` fields", async () => {
-      const savedCharge = await Charge.build(chargeOptions).save();
+      await card.save();
+      const savedCharge = await charge.save();
       expect(savedCharge.amount).to.equal(chargeOptions.amount);
       expect(savedCharge.CardId).to.equal(chargeOptions.CardId);
     });
 
-    it("includes `amount,` `CardId` fields", async () => {
-      const savedPayment = await Payment.build(paymentOptions).save();
+    it("payment includes `amount,` `CardId` fields", async () => {
+      await card.save();
+      const savedPayment = await payment.save();
       expect(savedPayment.amount).to.equal(paymentOptions.amount);
       expect(savedPayment.CardId).to.equal(paymentOptions.CardId);
     });
-
-    // it("increases `balance` on associated card", async () => {
-    //   let savedCard = await card.save();
-    //   let savedVal = savedCard.dataValues;
-    //   console.log(savedVal);
-    //   let savedCharge = await charge.save();
-    //   console.log(savedCharge.dataValues);
-    //   console.log(await Card.findByPk(1));
-
-    //   // let origBalance;
-    //   // let savedCharge;
-    //   // let newBalance;
-    //   // let savedCard;
-    //   // let obj = {};
-    //   // Card.build(cardOptions)
-    //   //   .save()
-    //   //   .then(function(result) {
-    //   //     obj.origBalance = result.get("balance");
-    //   //     obj.savedCard = result;
-    //   //     return obj;
-    //   //   })
-    //   //   .then(function(result) {
-    //   //     result.savedCharge = Charge.build(chargeOptions).save();
-    //   //     return result;
-    //   //   })
-    //   //   .then(function(result) {
-    //   //     result.newBalance = Card.findByPk(1);
-    //   //     return result;
-    //   //   })
-    //   //   .then(function(result) {
-    //   //     console.log(result);
-    //   //   });
-    // });
-
-    // it("increments accrued interest accurately", async () => {
-    //   let clock = sinon.useFakeTimers(new Date());
-    //   const savedCard = await card.save();
-    //   //simulate a charge so interest will accrue
-    //   savedCard.setDataValue("balance", 20.01);
-    //   let interestDayZero = savedCard.get("thisMonthsAccruedInterest");
-    //   //move the clock forward one day
-    //   clock.tick("24:00:00");
-    //   let interestDayOne = savedCard.get("thisMonthsAccruedInterest");
-    //   expect(interestDayOne).to.greaterThan(interestDayZero);
-    //   //restore clock
-    //   clock.restore();
-    // });
   });
 });
 
@@ -256,16 +222,46 @@ describe("Changes in balance and interest over time", () => {
       clock.restore();
     });
 
-    it("increments accrued interest accurately", async () => {
+    it("TEST SCENARIO 1A: increments accrued interest accurately", async () => {
       let clock = sinon.useFakeTimers(new Date());
       const savedCard = await card.save();
       //simulate a charge so interest will accrue
-      savedCard.setDataValue("balance", 20.01);
+      savedCard.setDataValue("balance", 500);
       let interestDayZero = savedCard.get("thisMonthsAccruedInterest");
-      //move the clock forward one day
+      //move the clock forward one month
+      let dayCount = 0;
+      while (dayCount < 30) {
+        clock.tick("24:00:00");
+        dayCount++;
+      }
+
+      let interestDayThirty = savedCard.get("thisMonthsAccruedInterest");
+      expect(interestDayThirty).to.greaterThan(interestDayZero);
+      expect(interestDayThirty).to.equal(14.383561643835622);
+    });
+
+    it("TEST SCENARIO 1B: adds interest to balance at apropriate time", async () => {
+      let clock = sinon.useFakeTimers(new Date());
+
+      //simulate a charge so interest will accrue
+      const savedCard = await card.save();
+      savedCard.setDataValue("balance", 500);
+      let interestDayZero = savedCard.get("thisMonthsAccruedInterest");
+      //move the clock forward one month
+      let dayCount = 0;
+      while (dayCount < 30) {
+        clock.tick("24:00:00");
+        console.log(savedCard.get("thisMonthsAccruedInterest"));
+        dayCount++;
+      }
+
+      //move forward one more day to start a new month
       clock.tick("24:00:00");
-      let interestDayOne = savedCard.get("thisMonthsAccruedInterest");
-      expect(interestDayOne).to.greaterThan(interestDayZero);
+
+      let balanceDayThirty = savedCard.get("balance");
+
+      //this number is off by one day - should be 514.3835616438356
+      expect(balanceDayThirty).to.equal(514.8630136986302);
       //restore clock
       clock.restore();
     });

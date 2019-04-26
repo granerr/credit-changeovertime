@@ -55,7 +55,7 @@ Card.addHook("afterCreate", "changeOverTime", (card, options) => {
   }
 
   function haveThirtyDaysPassed() {
-    if (card.dayCount != 30) {
+    if (card.dayCount < 30) {
       return false;
     }
     return true;
@@ -66,6 +66,7 @@ Card.addHook("afterCreate", "changeOverTime", (card, options) => {
     if (!hasOneDayPassed()) {
       return false;
     }
+
     //save today's date
     card.savedDate = new Date();
     //update accrued interest
@@ -92,9 +93,6 @@ Card.addHook("afterCreate", "changeOverTime", (card, options) => {
     runOncePerDay();
   }, dayInMilliseconds);
   card.timerOn = true;
-
-  console.log("run setinterval");
-  return "changeOverTime has completed running";
 });
 
 module.exports = Card;

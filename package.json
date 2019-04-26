@@ -1,7 +1,7 @@
 {
-  "name": "simple-react-full-stack",
+  "name": "rgraner-avant-take-home",
   "version": "1.0.0",
-  "description": "Boilerplate to build a full stack web application using React, Node.js, Express and Webpack.",
+  "description": "This is my response to the Avant Take Home Challenge related to the New Grad Program, 2019.",
   "main": "src/server/index.js",
   "scripts": {
     "build": "webpack --mode production",
@@ -15,6 +15,7 @@
   "author": "Sandeep Raveesh",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.6.2",
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.4",
     "body-parser": "^1.18.3",

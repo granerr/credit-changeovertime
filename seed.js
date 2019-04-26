@@ -17,7 +17,6 @@ const paymentData = [{ accountNumber: 5678, amount: 300, date: 15, CardId: 2 }];
 const seed = async () => {
   try {
     await db.sync({ force: true });
-    // seed your database here!
     const cards = await Promise.all(cardData.map(card => Card.create(card)));
     const payments = await Promise.all(
       paymentData.map(payment => Payment.create(payment))

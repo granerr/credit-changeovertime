@@ -27,21 +27,8 @@ router.get("/cards/:accountNumber", async (req, res, next) => {
   try {
     const accountNumber = req.params.accountNumber;
     const data = await Card.findOne({
-      where: { accountNumber: accountNumber }
-      // include: [{ model: Charge }, { model: Payment }]
-    });
-    res.json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-//SINGLECARD API ROUTE
-router.get("/cards/:cardId", async (req, res, next) => {
-  try {
-    const cardId = req.params.cardId;
-    const data = await Card.findOne({
-      where: { id: cardId },
-      include: [{ model: Charge }, { model: Payment }]
+      where: { accountNumber: accountNumber },
+      include: [{ all: true, nested: true }]
     });
     res.json(data);
   } catch (err) {
@@ -66,13 +53,26 @@ router.put("/cards/:accountNumber", async (req, res, next) => {
     const accountNumber = req.params.accountNumber;
     const foundCard = await Card.findOne({
       where: { accountNumber: accountNumber },
-      include: [{ model: Charge }, { model: Payment }]
+      include: [{ all: true, nested: true }]
     });
     const updatedCard = await foundCard.update(req.body);
     res.json({
       message: "Updated successfully",
       card: updatedCard
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+//GET CHARGES API ROUTE
+router.get("/charges", async (req, res, next) => {
+  try {
+    const accountNumber = req.body.accountNumber;
+    const data = await Charge.findAll({
+      where: { accountNumber: accountNumber }
+    });
+    res.json(data);
   } catch (err) {
     next(err);
   }
@@ -101,8 +101,7 @@ router.post("/charges", async (req, res, next) => {
     const newBal = balAfterCharge(balAfterChargeObj);
     //put new balance to card
     const updateBody = {
-      balance: newBal,
-      dayCount: 0
+      balance: newBal
     };
     const updatedCard = await data.update(updateBody);
     res.json({
@@ -110,6 +109,19 @@ router.post("/charges", async (req, res, next) => {
       card: updatedCard,
       newCharge: savingCharge
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+//GET PAYMENTS API ROUTE
+router.get("/payments", async (req, res, next) => {
+  try {
+    const accountNumber = req.body.accountNumber;
+    const data = await Payment.findAll({
+      where: { accountNumber: accountNumber }
+    });
+    res.json(data);
   } catch (err) {
     next(err);
   }
