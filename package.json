@@ -1,7 +1,7 @@
 {
-  "name": "rgraner-avant-take-home",
+  "name": "credit-changeovertime",
   "version": "1.0.0",
-  "description": "This is my response to the Avant Take Home Challenge related to the New Grad Program, 2019.",
+  "description": "This is a quick exercise to develop a series of tests for a Sequelize model with an afterCreate hook that implements a timed-interval update.",
   "main": "src/server/index.js",
   "scripts": {
     "build": "webpack --mode production",

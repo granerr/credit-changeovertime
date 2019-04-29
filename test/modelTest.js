@@ -246,22 +246,21 @@ describe("Changes in balance and interest over time", () => {
       //simulate a charge so interest will accrue
       const savedCard = await card.save();
       savedCard.setDataValue("balance", 500);
-      let interestDayZero = savedCard.get("thisMonthsAccruedInterest");
+
       //move the clock forward one month
-      let dayCount = 0;
+      let dayCount = savedCard.get("dayCount");
       while (dayCount < 30) {
+        savedCard.setDataValue("dayCount", dayCount++);
         clock.tick("24:00:00");
-        console.log(savedCard.get("thisMonthsAccruedInterest"));
-        dayCount++;
       }
 
       //move forward one more day to start a new month
       clock.tick("24:00:00");
-
       let balanceDayThirty = savedCard.get("balance");
-
-      //this number is off by one day - should be 514.3835616438356
+      let interestDayThirty = savedCard.get("thisMonthsAccruedInterest");
       expect(balanceDayThirty).to.equal(514.8630136986302);
+      expect(interestDayThirty).to.equal(0);
+
       //restore clock
       clock.restore();
     });

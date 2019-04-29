@@ -40,7 +40,6 @@ const Card = db.define("Card", {
 });
 
 Card.addHook("afterCreate", "changeOverTime", (card, options) => {
-  // Card.prototype.changeOverTime = function() {
   // Interest is calculated daily, starting the day after the account is opened, at the close of each day.
   // Calculated interest becomes due at the close every 30 days after the account has been opened.
 
@@ -49,7 +48,7 @@ Card.addHook("afterCreate", "changeOverTime", (card, options) => {
     // get today's date
     const date = new Date();
     // inferring a day has yet to pass since both dates are equal.
-    if (card.savedDate == date) return false;
+    if (card.savedDate === date) return false;
     // this portion of logic occurs when a day has passed
     return true;
   }
