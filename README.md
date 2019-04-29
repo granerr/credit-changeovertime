@@ -1,4 +1,4 @@
-# Avant Take Home Challenge - R Graner
+# Testing Credit Changes Over Time
 
 This is a quick exercise to develop a series of tests for a Sequelize model with an afterCreate hook that implements a timed-interval update.
 
