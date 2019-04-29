@@ -1,14 +1,29 @@
 const { green, red } = require("chalk");
-const { db, Card } = require("./src/server/db");
-// const { cardData, projectData, projectTeams } = require('./server/db/dataForDB')
+const { db, Card, Charge, Payment } = require("./src/server/db");
 
-const cardData = [{ accountNumber: 1234 }, { accountNumber: 5678 }];
+const cardData = [
+  { accountNumber: 1234, APR: 0.35, creditLimit: 1000, balance: 0 },
+  { accountNumber: 5678, APR: 0.35, creditLimit: 1000, balance: 0 }
+];
+
+const chargeData = [
+  { accountNumber: 1234, amount: 500, date: 0, CardId: 1 },
+  { accountNumber: 5678, amount: 500, date: 0, CardId: 2 },
+  { accountNumber: 5678, amount: 100, date: 25, CardId: 2 }
+];
+
+const paymentData = [{ accountNumber: 5678, amount: 300, date: 15, CardId: 2 }];
 
 const seed = async () => {
   try {
     await db.sync({ force: true });
-    // seed your database here!
     const cards = await Promise.all(cardData.map(card => Card.create(card)));
+    const payments = await Promise.all(
+      paymentData.map(payment => Payment.create(payment))
+    );
+    const charges = await Promise.all(
+      chargeData.map(charge => Charge.create(charge))
+    );
   } catch (err) {
     console.log(red(err));
   }
